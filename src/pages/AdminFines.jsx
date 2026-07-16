@@ -61,6 +61,7 @@ export default function AdminFines() {
 
     // Tracking which rows are being saved
     const [markingPaid, setMarkingPaid] = useState({});
+    const [markingUnpaid, setMarkingUnpaid] = useState({});
 
     // ---------- fetch fine settings ----------
     useEffect(() => {
@@ -156,7 +157,7 @@ export default function AdminFines() {
     const referenceDate = isCurrentMonth ? now : new Date(y, m, 0);
 
     // ---------- mark as paid ----------
-    const handleMarkPaid = async (student, currentFine) => {
+    const handleMarkPaid = async (student) => {
         setMarkingPaid(prev => ({ ...prev, [student.messNumber]: true }));
 
         const { error } = await supabase
@@ -165,7 +166,7 @@ export default function AdminFines() {
                 mess_number: student.messNumber,
                 hostel_id: user.hostelId,
                 month: monthKey,
-                fine_amount_at_payment: currentFine,
+                fine_amount_at_payment: 0, // Set fine to 0 when marked as paid
                 paid_by: user.name || user.email,
             });
 
@@ -176,6 +177,26 @@ export default function AdminFines() {
             await fetchPayments();
         }
         setMarkingPaid(prev => ({ ...prev, [student.messNumber]: false }));
+    };
+
+    // ---------- mark as unpaid ----------
+    const handleMarkUnpaid = async (student) => {
+        setMarkingUnpaid(prev => ({ ...prev, [student.messNumber]: true }));
+
+        const { error } = await supabase
+            .from('fine_payments')
+            .delete()
+            .eq('hostel_id', user.hostelId)
+            .eq('mess_number', student.messNumber)
+            .eq('month', monthKey);
+
+        if (error) {
+            toast.error('Failed to mark as unpaid: ' + error.message);
+        } else {
+            toast.success(`${student.name} marked as unpaid`);
+            await fetchPayments();
+        }
+        setMarkingUnpaid(prev => ({ ...prev, [student.messNumber]: false }));
     };
 
     // ---------- computed student rows ----------
@@ -352,15 +373,24 @@ export default function AdminFines() {
                                             </td>
                                             <td className="px-5 py-4 text-center">
                                                 {student.isPaid ? (
-                                                    <span className="inline-flex items-center gap-1 text-xs text-emerald-600 font-medium">
-                                                        <CheckCircle2 className="w-3.5 h-3.5" /> Done
-                                                    </span>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        disabled={markingUnpaid[student.messNumber]}
+                                                        onClick={() => handleMarkUnpaid(student)}
+                                                        className="text-xs h-8 border-red-200 text-red-700 hover:bg-red-50 gap-1"
+                                                    >
+                                                        {markingUnpaid[student.messNumber]
+                                                            ? <><Loader2 className="w-3 h-3 animate-spin" /> Saving...</>
+                                                            : <><CheckCircle2 className="w-3 h-3" /> Mark Unpaid</>
+                                                        }
+                                                    </Button>
                                                 ) : (
                                                     <Button
                                                         size="sm"
                                                         variant="outline"
                                                         disabled={markingPaid[student.messNumber]}
-                                                        onClick={() => handleMarkPaid(student, student.fine)}
+                                                        onClick={() => handleMarkPaid(student)}
                                                         className="text-xs h-8 border-emerald-500 text-emerald-700 hover:bg-emerald-50 gap-1"
                                                     >
                                                         {markingPaid[student.messNumber]
