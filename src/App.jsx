@@ -10,6 +10,7 @@ import ManageMenu from './pages/ManageMenu';
 import ManageStudents from './pages/ManageStudents';
 import ManageLeaves from './pages/ManageLeaves';
 import AdminBills from './pages/AdminBills';
+import AdminFines from './pages/AdminFines';
 import AdminSettings from './pages/AdminSettings';
 import LeaveTillJoinList from './pages/LeaveTillJoinList';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -52,6 +53,7 @@ export default function App() {
                 <Route path="students" element={<ManageStudents />} />
                 <Route path="leaves" element={<ManageLeaves />} />
                 <Route path="bills" element={<AdminBills />} />
+                <Route path="fines" element={<AdminFines />} />
                 <Route path="settings" element={<AdminSettings />} />
                 <Route path="ltj-list" element={<LeaveTillJoinList />} />
             </Route>

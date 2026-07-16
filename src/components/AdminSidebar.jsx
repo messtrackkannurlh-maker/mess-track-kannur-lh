@@ -9,7 +9,8 @@ import {
     Bell,
     FileSpreadsheet,
     Settings,
-    CalendarCheck
+    CalendarCheck,
+    IndianRupee
 } from 'lucide-react';
 import { Separator } from './ui/separator';
 
@@ -20,6 +21,7 @@ const navItems = [
     { to: '/admin/leaves', label: 'Leave Reports', icon: Bell },
     { to: '/admin/ltj-list', label: 'Leave Till Join List', icon: CalendarCheck },
     { to: '/admin/bills', label: 'Finance', icon: FileSpreadsheet },
+    { to: '/admin/fines', label: 'Fines', icon: IndianRupee },
     { to: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -39,7 +41,7 @@ export default function AdminSidebar() {
                 <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center">
                     <ChefHat className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-lg font-bold tracking-tight text-white">MessPro Admin</span>
+                <span className="text-lg font-bold tracking-tight text-white">Mess Track-K</span>
             </div>
 
             {/* Navigation */}

@@ -1,64 +1,110 @@
 import { useState, useEffect } from 'react';
-import { useHostel } from '../context/HostelContext';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
-import { Save, Settings, DatabaseBackup, Download } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
 import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../context/AuthContext';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Save, Settings, DatabaseBackup, Download, IndianRupee } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function AdminSettings() {
-    const { messRate, cutoffTime, hostelName, updateSettings, loading } = useHostel();
-
-    const [rate, setRate] = useState(messRate);
-    const [cutoff, setCutoff] = useState(cutoffTime);
+    const { user } = useAuth();
+    const [hostelData, setHostelData] = useState({ messRate: '', cutoffTime: 20, hostelName: '', loading: true });
+    const [rate, setRate] = useState('');
+    const [cutoff, setCutoff] = useState(20);
     const [isSaving, setIsSaving] = useState(false);
     const [isBackingUp, setIsBackingUp] = useState(false);
 
-    // Sync state when context loads
+    // Fine due date state
+    const [fineDueDate, setFineDueDate] = useState('');
+    const [isSavingFine, setIsSavingFine] = useState(false);
+    const currentMonthKey = new Date().toISOString().slice(0, 7); // "YYYY-MM"
+
+    // Fetch hostel settings
     useEffect(() => {
-        setRate(messRate);
-        setCutoff(cutoffTime);
-    }, [messRate, cutoffTime]);
+        if (!user?.hostelId) return;
+        const fetch = async () => {
+            const { data, error } = await supabase
+                .from('hostels')
+                .select('name, mess_rate, cutoff_time')
+                .eq('id', user.hostelId)
+                .single();
+
+            if (!error && data) {
+                setHostelData({ messRate: data.mess_rate, cutoffTime: data.cutoff_time, hostelName: data.name, loading: false });
+                setRate(data.mess_rate);
+                setCutoff(data.cutoff_time);
+            } else {
+                setHostelData(prev => ({ ...prev, loading: false }));
+            }
+        };
+        fetch();
+    }, [user?.hostelId]);
+
+    // Fetch current month's fine due date
+    useEffect(() => {
+        const fetchFineSetting = async () => {
+            const { data } = await supabase
+                .from('fine_settings')
+                .select('due_date')
+                .eq('month', currentMonthKey)
+                .maybeSingle();
+            if (data?.due_date) setFineDueDate(data.due_date);
+        };
+        fetchFineSetting();
+    }, [currentMonthKey]);
 
     const handleSave = async (e) => {
         e.preventDefault();
         setIsSaving(true);
 
-        const result = await updateSettings({
-            messRate: parseInt(rate),
-            cutoffTime: parseInt(cutoff),
-        });
+        const { error } = await supabase
+            .from('hostels')
+            .update({ mess_rate: parseInt(rate), cutoff_time: parseInt(cutoff) })
+            .eq('id', user.hostelId);
 
-        if (result.success) {
-            toast.success('Settings updated successfully');
+        if (error) {
+            toast.error('Failed to update settings: ' + error.message);
         } else {
-            toast.error('Failed to update settings: ' + result.error);
+            toast.success('Settings updated successfully');
+            setHostelData(prev => ({ ...prev, messRate: parseInt(rate), cutoffTime: parseInt(cutoff) }));
         }
         setIsSaving(false);
     };
 
+    const handleSaveFineDueDate = async (e) => {
+        e.preventDefault();
+        if (!fineDueDate) return toast.error('Please select a due date');
+        setIsSavingFine(true);
+
+        const { error } = await supabase
+            .from('fine_settings')
+            .upsert({ month: currentMonthKey, due_date: fineDueDate }, { onConflict: 'month' });
+
+        if (error) {
+            toast.error('Failed to save due date: ' + error.message);
+        } else {
+            toast.success('Fine due date saved for ' + new Date(currentMonthKey + '-01').toLocaleString('default', { month: 'long', year: 'numeric' }));
+        }
+        setIsSavingFine(false);
+    };
+
+    // Computed grace end
+    const graceEndDate = fineDueDate
+        ? new Date(new Date(fineDueDate).setDate(new Date(fineDueDate).getDate() + 7)).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+        : null;
+
     const handleBackup = async () => {
         if (!confirm('Download a full backup of your data?')) return;
-
         setIsBackingUp(true);
         const toastId = toast.loading('Generating backup...');
-
         try {
-            // Fetch data from main tables
             const tables = ['students', 'leaves', 'weekly_menu'];
-            const backupData = {
-                timestamp: new Date().toISOString(),
-                hostelName,
-                data: {}
-            };
-
+            const backupData = { timestamp: new Date().toISOString(), hostelName: hostelData.hostelName, data: {} };
             for (const table of tables) {
                 const { data, error } = await supabase.from(table).select('*');
                 if (error) throw error;
                 backupData.data[table] = data;
             }
-
-            // Create and download file
             const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -68,7 +114,6 @@ export default function AdminSettings() {
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-
             toast.success('Backup downloaded successfully', { id: toastId });
         } catch (error) {
             console.error('Backup error:', error);
@@ -78,7 +123,7 @@ export default function AdminSettings() {
         }
     };
 
-    if (loading) return <div className="p-8">Loading settings...</div>;
+    if (hostelData.loading) return <div className="p-8">Loading settings...</div>;
 
     return (
         <div className="space-y-8 animate-fade-in max-w-2xl mx-auto">
@@ -87,9 +132,10 @@ export default function AdminSettings() {
             {/* Page Header */}
             <div className="space-y-1">
                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Hostel Settings</h1>
-                <p className="text-gray-500 text-base">Manage configuration for {hostelName || 'your hostel'}</p>
+                <p className="text-gray-500 text-base">Manage configuration for {hostelData.hostelName || 'your hostel'}</p>
             </div>
 
+            {/* General Configuration */}
             <Card className="border-gray-200 shadow-sm overflow-hidden">
                 <CardHeader className="bg-gray-50/50 border-b border-gray-100 p-6">
                     <div className="flex items-center gap-3">
@@ -104,7 +150,6 @@ export default function AdminSettings() {
                 </CardHeader>
                 <CardContent className="p-6 pt-6">
                     <form onSubmit={handleSave} className="space-y-8">
-
                         {/* Mess Rate */}
                         <div className="space-y-3">
                             <label className="block text-sm font-semibold text-gray-700">Daily Mess Rate</label>
@@ -142,18 +187,78 @@ export default function AdminSettings() {
                                     ))}
                                 </select>
                             </div>
-                            <p className="text-xs text-gray-400">
-                                Students cannot apply for next-day leave after this time.
-                            </p>
+                            <p className="text-xs text-gray-400">Students cannot apply for next-day leave after this time.</p>
                         </div>
 
                         <div className="border-t border-gray-100" />
 
-                        {/* Save */}
                         <div className="flex justify-end pt-2">
                             <Button type="submit" disabled={isSaving} className="gap-2 px-6">
                                 <Save className="w-4 h-4" />
                                 {isSaving ? 'Saving...' : 'Save Configuration'}
+                            </Button>
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
+
+            {/* Fine & Payment Settings */}
+            <Card className="border-gray-200 shadow-sm overflow-hidden">
+                <CardHeader className="bg-gray-50/50 border-b border-gray-100 p-6">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center shrink-0">
+                            <IndianRupee className="w-4 h-4 text-orange-600" />
+                        </div>
+                        <div>
+                            <CardTitle className="text-lg">Fine &amp; Payment Settings</CardTitle>
+                            <CardDescription className="mt-0.5">
+                                Set the mess fee payment due date for{' '}
+                                {new Date(currentMonthKey + '-01').toLocaleString('default', { month: 'long', year: 'numeric' })}.
+                            </CardDescription>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent className="p-6 pt-6">
+                    <form onSubmit={handleSaveFineDueDate} className="space-y-6">
+                        <div className="space-y-3">
+                            <label className="block text-sm font-semibold text-gray-700">Payment Due Date</label>
+                            <div className="max-w-xs">
+                                <input
+                                    type="date"
+                                    value={fineDueDate}
+                                    onChange={(e) => setFineDueDate(e.target.value)}
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 focus:bg-white transition-all"
+                                />
+                            </div>
+                            <p className="text-xs text-gray-400">
+                                Students must pay by this date. A 7-day grace period is added automatically.
+                            </p>
+                        </div>
+
+                        {/* Info box showing computed dates */}
+                        {fineDueDate && (
+                            <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 space-y-2">
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-500">Due Date</span>
+                                    <span className="font-semibold text-gray-800">
+                                        {new Date(fineDueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-500">Grace Period Ends</span>
+                                    <span className="font-semibold text-orange-700">{graceEndDate}</span>
+                                </div>
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-500">Fine starts from</span>
+                                    <span className="font-semibold text-red-600">Day 4 overdue onwards — ₹15 increment every 4 days</span>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="flex justify-end">
+                            <Button type="submit" disabled={isSavingFine} className="gap-2 px-6 bg-orange-600 hover:bg-orange-700 text-white">
+                                <Save className="w-4 h-4" />
+                                {isSavingFine ? 'Saving...' : 'Save Due Date'}
                             </Button>
                         </div>
                     </form>

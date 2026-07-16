@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar';
 import MobileNav from '../components/MobileNav';
-import { Bell, LayoutDashboard, UtensilsCrossed, Users, Menu, FileSpreadsheet, Settings, CalendarCheck } from 'lucide-react';
+import { Bell, LayoutDashboard, UtensilsCrossed, Users, Menu, FileSpreadsheet, Settings, CalendarCheck, IndianRupee } from 'lucide-react';
 import { Button } from '../components/ui/button';
 
 export default function AdminLayout() {
@@ -15,6 +15,7 @@ export default function AdminLayout() {
         { to: '/admin/leaves', label: 'Leave Reports', icon: Bell },
         { to: '/admin/ltj-list', label: 'Leave Till Join List', icon: CalendarCheck },
         { to: '/admin/bills', label: 'Finance', icon: FileSpreadsheet },
+        { to: '/admin/fines', label: 'Fines', icon: IndianRupee },
         { to: '/admin/settings', label: 'Settings', icon: Settings },
     ];
 
@@ -41,7 +42,7 @@ export default function AdminLayout() {
                         >
                             <Menu className="w-6 h-6" />
                         </button>
-                        <h2 className="text-lg font-semibold text-gray-800">MessPro Admin</h2>
+                        <h2 className="text-lg font-semibold text-gray-800">Mess Track-K</h2>
                     </div>
                     {/* Spacer for desktop alignment if needed */}
                     <div className="hidden lg:block"></div>

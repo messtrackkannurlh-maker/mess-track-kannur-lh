@@ -1,18 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="64" fill="#4F46E5"/>
-  <g transform="translate(256, 260)" fill="white">
-    <!-- Chef hat body -->
-    <ellipse cx="0" cy="30" rx="95" ry="70" fill="white"/>
-    <!-- Chef hat top puffs -->
-    <circle cx="0" cy="-50" r="55"/>
-    <circle cx="-50" cy="-20" r="45"/>
-    <circle cx="50" cy="-20" r="45"/>
-    <circle cx="-35" cy="-55" r="40"/>
-    <circle cx="35" cy="-55" r="40"/>
-    <!-- Hat band -->
-    <rect x="-90" y="55" width="180" height="45" rx="6" fill="#4338CA"/>
-    <!-- Lines on band -->
-    <rect x="-60" y="68" width="120" height="3" rx="1.5" fill="white" opacity="0.4"/>
-    <rect x="-45" y="78" width="90" height="3" rx="1.5" fill="white" opacity="0.3"/>
+  <rect width="512" height="512" rx="96" fill="white"/>
+  <rect x="8" y="8" width="496" height="496" rx="88" fill="white" stroke="#111" stroke-width="6"/>
+  <g transform="translate(256, 256)">
+    <!-- Fork (rotated -35deg) -->
+    <g transform="rotate(-35)">
+      <!-- Handle -->
+      <rect x="-12" y="20" width="24" height="160" rx="12" fill="#111"/>
+      <!-- Head -->
+      <rect x="-12" y="-140" width="24" height="100" rx="8" fill="#111"/>
+      <!-- Tines -->
+      <rect x="-30" y="-175" width="8" height="80" rx="4" fill="#111"/>
+      <rect x="-10" y="-175" width="8" height="80" rx="4" fill="#111"/>
+      <rect x="10" y="-175" width="8" height="80" rx="4" fill="#111"/>
+      <rect x="30" y="-175" width="8" height="80" rx="4" fill="#111"/>
+      <!-- Connecting bar at top of tines -->
+      <rect x="-34" y="-100" width="76" height="10" rx="5" fill="#111"/>
+    </g>
+    <!-- Knife (rotated +35deg) -->
+    <g transform="rotate(35)">
+      <!-- Handle -->
+      <rect x="-12" y="20" width="24" height="160" rx="12" fill="#111"/>
+      <!-- Blade -->
+      <path d="M-14,-160 Q-16,-40 -12,20 L12,20 Q16,-40 14,-160 Q14,-175 0,-180 Q-14,-175 -14,-160Z" fill="#111"/>
+      <!-- Spine highlight -->
+      <rect x="8" y="-155" width="3" height="160" rx="1.5" fill="white" opacity="0.3"/>
+    </g>
   </g>
 </svg>
