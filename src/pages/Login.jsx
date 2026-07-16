@@ -47,9 +47,7 @@ export default function Login() {
             <div className="w-full max-w-[400px] animate-fade-in">
                 {/* Minimal Logo Header */}
                 <div className="text-center mb-10">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 shadow-sm shadow-indigo-200 mb-4">
-                        <ChefHat className="w-6 h-6 text-white" />
-                    </div>
+                    <img src="/icon.svg" className="w-14 h-14 rounded-2xl shadow-sm mx-auto mb-4 border border-gray-100" alt="Mess Track-K Logo" />
                     <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Mess Track-K</h1>
                     <p className="text-sm text-gray-500 mt-2">Sign in to your account</p>
                 </div>

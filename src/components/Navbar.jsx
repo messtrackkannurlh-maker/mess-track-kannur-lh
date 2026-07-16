@@ -28,9 +28,7 @@ export default function Navbar({ onMenuClick }) {
                     </button>
 
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-sm shadow-indigo-200">
-                            <ChefHat className="w-4 h-4 text-white" />
-                        </div>
+                        <img src="/icon.svg" className="w-8 h-8 rounded-lg" alt="Mess Track-K Logo" />
                         <span className="text-lg font-bold text-gray-900 tracking-tight hidden sm:block">Mess Track-K</span>
                     </div>
                 </div>
