@@ -46,8 +46,8 @@ export default function Login() {
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
             <div className="w-full max-w-[400px] animate-fade-in">
                 {/* Minimal Logo Header */}
-                <div className="text-center mb-10">
-                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl shadow-sm mb-4 border border-gray-100 overflow-hidden">
+                <div className="flex flex-col items-center text-center mb-10">
+                    <div className="w-14 h-14 rounded-2xl shadow-sm mb-4 border border-gray-100 overflow-hidden flex items-center justify-center bg-white">
                         <img src="/icon.svg" className="w-full h-full object-cover" alt="Mess Track-K Logo" />
                     </div>
                     <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Mess Track-K</h1>
