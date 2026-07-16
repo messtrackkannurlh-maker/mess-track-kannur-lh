@@ -1,17 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#ffffff"/>
+  <!-- Premium Dark Charcoal Background -->
+  <rect width="512" height="512" rx="140" fill="#111111"/>
+  
+  <!-- Subtle Elegant Inner Border -->
+  <rect x="16" y="16" width="480" height="480" rx="128" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.1"/>
+
   <g transform="translate(256, 256)">
-    <!-- Fork -->
+    <!-- Fork (Rotated -45deg) -->
     <g transform="rotate(-45)">
-      <path d="M10,-30 C10,-60 42,-80 42,-100 L42,-200 A 6 6 0 0 0 30 -200 L30,-130 A 6 6 0 0 1 18 -130 L18,-200 A 6 6 0 0 0 6 -200 L6,-130 A 6 6 0 0 1 -6 -130 L-6,-200 A 6 6 0 0 0 -18 -200 L-18,-130 A 6 6 0 0 1 -30 -130 L-30,-200 A 6 6 0 0 0 -42 -200 L-42,-100 C-42,-80 -10,-60 -10,-30 L-10,80 A 10 10 0 0 0 10 80 Z" fill="#ffffff" stroke="#000000" stroke-width="20" stroke-linejoin="round"/>
+      <path d="M -5,30 L -5,150 C -5,158 5,158 5,150 L 5,30 C 5,10 25,-10 25,-40 L 25,-120 C 25,-126 15,-126 15,-120 L 15,-70 C 15,-76 5,-76 5,-70 L 5,-120 C 5,-126 -5,-126 -5,-120 L -5,-70 C -5,-76 -15,-76 -15,-70 L -15,-120 C -15,-126 -25,-126 -25,-120 L -25,-40 C -25,-10 -5,10 -5,30 Z" fill="#ffffff"/>
     </g>
-    <!-- Spoon Mask -->
+    
+    <!-- Knife Cutout / Mask (Same path as knife but thick dark stroke) -->
     <g transform="rotate(45)">
-      <path d="M-10,-30 L-10,80 A 10 10 0 0 0 10 80 L10,-30 C10,-60 36,-90 36,-150 C36,-200 18,-230 0,-230 C-18,-230 -36,-200 -36,-150 C-36,-90 -10,-60 -10,-30 Z" fill="#ffffff" stroke="#ffffff" stroke-width="60" stroke-linejoin="round"/>
+      <path d="M -5,30 L -5,150 C -5,158 5,158 5,150 L 5,30 C 5,10 16,0 16,-20 L 16,-100 C 16,-130 5,-145 -5,-145 L -5,30 Z" fill="#111111" stroke="#111111" stroke-width="24" stroke-linejoin="round"/>
     </g>
-    <!-- Spoon -->
+    
+    <!-- Knife (Rotated 45deg) -->
     <g transform="rotate(45)">
-      <path d="M-10,-30 L-10,80 A 10 10 0 0 0 10 80 L10,-30 C10,-60 36,-90 36,-150 C36,-200 18,-230 0,-230 C-18,-230 -36,-200 -36,-150 C-36,-90 -10,-60 -10,-30 Z" fill="#ffffff" stroke="#000000" stroke-width="20" stroke-linejoin="round"/>
+      <path d="M -5,30 L -5,150 C -5,158 5,158 5,150 L 5,30 C 5,10 16,0 16,-20 L 16,-100 C 16,-130 5,-145 -5,-145 L -5,30 Z" fill="#ffffff"/>
     </g>
   </g>
 </svg>
