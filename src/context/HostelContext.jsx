@@ -40,7 +40,7 @@ export function HostelProvider({ children }) {
                         messRate: data.mess_rate,
                         cutoffTime: data.cutoff_time,
                         hostelName: data.name,
-                        maxLeaves: data.max_leaves, // null from DB = unlimited
+                        maxLeaves: data.max_leaves ?? 10, // Default to 10 if null
                         loading: false,
                     });
                 }
@@ -63,6 +63,7 @@ export function HostelProvider({ children }) {
                 .update({
                     mess_rate: newSettings.messRate,
                     cutoff_time: newSettings.cutoffTime,
+                    max_leaves: newSettings.maxLeaves,
                 })
                 .eq('id', user.hostelId);
 
@@ -73,6 +74,7 @@ export function HostelProvider({ children }) {
                 ...prev,
                 messRate: newSettings.messRate,
                 cutoffTime: newSettings.cutoffTime,
+                maxLeaves: newSettings.maxLeaves,
             }));
 
             return { success: true };

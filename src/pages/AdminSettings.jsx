@@ -8,9 +8,10 @@ import toast, { Toaster } from 'react-hot-toast';
 
 export default function AdminSettings() {
     const { user } = useAuth();
-    const [hostelData, setHostelData] = useState({ messRate: '', cutoffTime: 20, hostelName: '', loading: true });
+    const [hostelData, setHostelData] = useState({ messRate: '', cutoffTime: 20, maxLeaves: 10, hostelName: '', loading: true });
     const [rate, setRate] = useState('');
     const [cutoff, setCutoff] = useState(20);
+    const [maxLeaves, setMaxLeaves] = useState(10);
     const [isSaving, setIsSaving] = useState(false);
     const [isBackingUp, setIsBackingUp] = useState(false);
 
@@ -25,14 +26,15 @@ export default function AdminSettings() {
         const fetch = async () => {
             const { data, error } = await supabase
                 .from('hostels')
-                .select('name, mess_rate, cutoff_time')
+                .select('name, mess_rate, cutoff_time, max_leaves')
                 .eq('id', user.hostelId)
                 .single();
 
             if (!error && data) {
-                setHostelData({ messRate: data.mess_rate, cutoffTime: data.cutoff_time, hostelName: data.name, loading: false });
+                setHostelData({ messRate: data.mess_rate, cutoffTime: data.cutoff_time, maxLeaves: data.max_leaves ?? 10, hostelName: data.name, loading: false });
                 setRate(data.mess_rate);
                 setCutoff(data.cutoff_time);
+                setMaxLeaves(data.max_leaves ?? 10);
             } else {
                 setHostelData(prev => ({ ...prev, loading: false }));
             }
@@ -59,14 +61,14 @@ export default function AdminSettings() {
 
         const { error } = await supabase
             .from('hostels')
-            .update({ mess_rate: parseInt(rate), cutoff_time: parseInt(cutoff) })
+            .update({ mess_rate: parseInt(rate), cutoff_time: parseInt(cutoff), max_leaves: parseInt(maxLeaves) })
             .eq('id', user.hostelId);
 
         if (error) {
             toast.error('Failed to update settings: ' + error.message);
         } else {
             toast.success('Settings updated successfully');
-            setHostelData(prev => ({ ...prev, messRate: parseInt(rate), cutoffTime: parseInt(cutoff) }));
+            setHostelData(prev => ({ ...prev, messRate: parseInt(rate), cutoffTime: parseInt(cutoff), maxLeaves: parseInt(maxLeaves) }));
         }
         setIsSaving(false);
     };
@@ -188,6 +190,24 @@ export default function AdminSettings() {
                                 </select>
                             </div>
                             <p className="text-xs text-gray-400">Students cannot apply for next-day leave after this time.</p>
+                        </div>
+
+                        <div className="border-t border-gray-100" />
+
+                        {/* Max Leaves */}
+                        <div className="space-y-3">
+                            <label className="block text-sm font-semibold text-gray-700">Max Leaves per Month</label>
+                            <div className="max-w-xs">
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={maxLeaves}
+                                    onChange={(e) => setMaxLeaves(e.target.value)}
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 focus:bg-white transition-all"
+                                    required
+                                />
+                            </div>
+                            <p className="text-xs text-gray-400">Maximum number of leave days a student can take per month.</p>
                         </div>
 
                         <div className="border-t border-gray-100" />
